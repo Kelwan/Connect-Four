@@ -38,7 +38,7 @@ Board.prototype.update = (() => {
 });
 
 Board.prototype.checkVictory = ((p1, p2) => {
-  let victory = false;]
+  let victory = false;
   let counter = 0;
   let anchor = undefined;
 
@@ -130,7 +130,9 @@ Player.prototype.input = ((piece) => {
   rl.question("Where would you place your piece?", function(answer){
     // TODO: Log answer in database
     console.log("Thank you for your valuable feedback: ", answer);
+    // YOU NEED TO UPDATE THE BOARD HERE INSTEAD OF MAIN.
     rl.close();
+    // To add to that, putting main here will cause it NOT be called again until the input is finished.
   });
 });
 
