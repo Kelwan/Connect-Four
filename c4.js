@@ -1,5 +1,7 @@
 
-var readline = require('readline');
+
+
+function Board(){
 
   let grid = [
     [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 "],
@@ -9,150 +11,178 @@ var readline = require('readline');
     ["| |", "| |", "| |", "| |", "| |", "| |"],
     ["| |", "| |", "| |", "| |", "| |", "| |"]
   ];
+  let turn = 0;
 
-let turn = 0;
-
-function Board(){
+  this.turn = turn;
+  this.grid = grid;
 
 }
 
-Board.prototype.turn = ((player1, player2) => {
-  if(turn == 0){
-    turn ++;
-    let input1 = player1.input(player1.piece);
-    let piece = new Piece(player1.piece, input1);
-    return piece;
-  }
-  else if(turn == 1){
-    turn --;
-    let input2 = player2.input(player2.piece);
-    let piece = new Piece(player2.piece, input2);
-    return piece;
-  }
-  else console.log("ERROR: Turns Broken");
-  //return piece;
+Board.prototype.print = (() => {
+  return grid;
 });
 
-Board.prototype.update = (() => {
-  console.log(grid);
+Board.prototype.checkTurn = ((pTurn) => {
+  if(pTurn == 0){
+    board.turn ++;
+    return 0;
+  }
+  else if (pTurn == 1){
+    board.turn --;
+    return 1;
+  }
+  else if(pTurn !== 0 && pTurn !== 1){
+    console.log("error!");
+  }
 });
 
-Board.prototype.checkVictory = ((p1, p2) => {
-  let victory = false;
-  let counter = 0;
-  let anchor = undefined;
+Board.prototype.run = ((chunk, board) => {
 
-  for(i = 1; i < grid.length; i++){
-    for(j = 0; j < 6; j++){
-      if(grid[i][j] == p1 || grid[i][j] == p2){
-        sweeper(i, j, p1, p2);
-      }
+  chunk.trim();
+
+  if(chunk == 1 || chunk == 2 || chunk == 3 || chunk == 4 || chunk == 5 || chunk == 6){
+    let turn = board.checkTurn(board.turn);
+    let victory = false;
+
+
+    if(turn == player1.turn){
+      console.log("Player 1's turn");
+      let piece = new Piece(player1.piece, chunk);
+      let turnCheck = piece.drop(piece, board.grid);
+
+      checkVertical(board.grid, player1.piece);
+      checkHorizontal(board.grid, player1.piece);
     }
-  }
 
+    else if (turn = player2.turn){
+      console.log("Player 2's turn");
+      let piece = new Piece(player2.piece, chunk);
+      let turnCheck = piece.drop(piece, board.grid); // I can't send the entirety of the board object without errors.... why?
 
-
-  if (counter == 4){
-    victory = true;
-    return victory;
-  }
-
-});
-
-function sweeper(v1, v2){
-  let counter = 0;
-  let dud = undefined;
-  let copy1 = v1;
-  let copy2 = v2;
-
-  // Sweeper will sift through everything around the anchor to find connections
-  for(i = 0; i < 4; i++){
-    for(j = v1 - 1; j < v1 + 2; j++){
-      for(k = v2 - 1; k < v2 + 2; k++){
-        if(grid[i][j] == grid[v1][v2]){
-          console.log("skip overlap");
-        }
-        //else if(grid[j][k] == checked){
-          //console.log("already checked");
-        //}
-        else if(grid[j][k] == p1){
-          console.log("connection found");
-          counter++;
-          v1 = j;
-          v2 = k;
-        }
-        else {
-          console.log("No connections found");
-        }
-      }
+      checkVertical(board.grid, player2.piece);
+      checkHorizontal(board.grid, player2.piece);
     }
+
   }
 
-
-
-}
-
-function Piece(type, lane){
-  this.type = type;
-  this.lane = lane;
-}
-
-Piece.prototype.drop = ((piece, input) => {
-  grid[1][input] = piece;
-
-for(i = 1; i < grid.length -1; i++){
-  if(grid[i + 1][input] == "| |"){
-    grid[i + 1][input] = piece;
-    grid[i][input] = "| |";
-  }
-  else if (grid[i + 1][input] == null){
-    console.log("bottom out!");
+  else if(chunk.toString() == "end"){
+    console.log("quit!");
     return;
   }
-}
 
-
+  else
+    console.log("This is not a valid input, please try again");
 });
 
+function checkVertical(board, piece){
 
-function Player(piece){
-  this.piece = piece;
-}
-
-Player.prototype.input = ((piece) => {
-//  console.log(piece + ", choose a lane 1-6");
-
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  rl.question("Where would you place your piece?", function(answer){
-    // TODO: Log answer in database
-    console.log("Thank you for your valuable feedback: ", answer);
-    // YOU NEED TO UPDATE THE BOARD HERE INSTEAD OF MAIN.
-    rl.close();
-    // To add to that, putting main here will cause it NOT be called again until the input is finished.
-  });
-});
-
-function main() {
-  let player1 = new Player("|X|");
-  let player2 = new Player("|O|");
-  let board = new Board();
+  let counter = 0;
   let victory = false;
 
-  let piece = (board.turn(player1, player2));
-
-  console.log(piece);
-
-  piece.drop(piece.type,piece.lane);
-  //board.update();
-  //let victor = board.checkVictory();
-
-  if (victory == false){
-  //  main();
+  for(i = 0; i < board.length; i++){
+    if(board[5][i] == piece){
+      counter++;
+      for(j = 0; j < 5; j++){
+        if(board[j][i] == piece){
+          counter++;
+        }
+        else if(board[j][i] !== piece){
+          counter = 0;
+        }
+      }
+    }
   }
+  if(counter >= 3){
+    console.log(piece + "Wins!");
+  }
+  console.log("vertical count: " + counter);
 }
 
-main();
+function checkHorizontal(board, piece){
+
+  let counter = 0;
+
+  for(i = 1; i < 6; i++){
+    if(board[i][0] == piece){
+      counter++;
+      for(j = 0; j < 6; j++){
+        if(board[i][j] == piece){
+          counter++;
+        }
+        else if(board[i][j] !== piece){
+          counter = 0;
+        }
+      }
+      if(counter >= 3){
+        console.log(piece + " wins!");
+      }
+    }
+  }
+  console.log("horizontal count: " + counter);
+}
+
+function Piece(type, input){
+  this.type = type;
+  this.input = input;
+}
+
+
+Piece.prototype.drop = ((piece, board) => {
+
+  let placed = false;
+
+  for(i = 0; i < board.length; i++){
+
+    if(piece.input - 1 == i /*&& board[1][i] == "| |"*/){
+
+      if(board[1][i] == "| |"){
+        board[1][i] = piece.type;
+
+        for(j = 0; j < 5; j++){
+          if(board[j + 1][i] == "| |"){
+            board[j + 1][i] = piece.type;
+            board[j][i] = "| |";
+            placed = true;
+          }
+        }
+      }
+      else if(board[1][i] !== "| |"){
+        console.log("space taken");
+
+      }
+    }
+  }
+
+  console.log(board);
+
+});
+
+
+function Player(piece, turn){
+  this.piece = piece;
+  this.turn = turn;
+}
+
+Player.prototype.input = ((board, callback) => {
+  console.log("do some input: ");
+  process.stdin.setEncoding('utf8');
+
+  process.stdin.on('readable', () => {
+    const chunk = process.stdin.read();
+    if (chunk !== null){
+      callback(chunk, board);
+    }
+  });
+});
+
+
+
+
+let board = new Board();
+
+console.log(board.grid);
+
+let player1 = new Player("|X|", 0);
+let player2 = new Player("|O|", 1);
+
+player1.input(board, board.run);
