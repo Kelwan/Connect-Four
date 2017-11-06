@@ -52,6 +52,7 @@ Board.prototype.run = ((chunk, board) => {
 
       checkVertical(board.grid, player1.piece);
       checkHorizontal(board.grid, player1.piece);
+      checkDiagonal(board.grid, player1.piece);
     }
 
     else if (turn = player2.turn){
@@ -61,6 +62,7 @@ Board.prototype.run = ((chunk, board) => {
 
       checkVertical(board.grid, player2.piece);
       checkHorizontal(board.grid, player2.piece);
+      checkDiagonal(board.grid, player2.piece);
     }
 
   }
@@ -76,49 +78,47 @@ Board.prototype.run = ((chunk, board) => {
 
 function checkVertical(board, piece){
 
-  let counter = 0;
-  let victory = false;
-
-  for(i = 0; i < board.length; i++){
-    if(board[5][i] == piece){
-      counter++;
-      for(j = 0; j < 5; j++){
-        if(board[j][i] == piece){
-          counter++;
-        }
-        else if(board[j][i] !== piece){
-          counter = 0;
-        }
-      }
+  for(let row = 1; row <= 5; row++){
+    let col = [];
+    for(let column = 0; column < 6; column++){
+      col.push(board[row][column]);
+      console.log(col[column][2]);
     }
+    checkColumn(col, piece);
   }
-  if(counter >= 3){
-    console.log(piece + "Wins!");
+}
+
+function checkColumn(col, piece){
+  for(let row = 0; row < col.length + 1; row++){
   }
-  console.log("vertical count: " + counter);
+  console.log(col[1][1]);
 }
 
 function checkHorizontal(board, piece){
+  for(let i = 1; i <= 5; i++){
+    checkRow(board[i], piece);
+  }
+}
 
+function checkRow(row, piece){
   let counter = 0;
-
-  for(i = 1; i < 6; i++){
-    if(board[i][0] == piece){
+  //console.log("Current row: " + row);
+  for(let i = 0; i < row.length; i++){
+    if (row[i] == piece){
       counter++;
-      for(j = 0; j < 6; j++){
-        if(board[i][j] == piece){
-          counter++;
-        }
-        else if(board[i][j] !== piece){
-          counter = 0;
-        }
-      }
-      if(counter >= 3){
-        console.log(piece + " wins!");
-      }
+      //console.log(piece + " = " + counter);
+    }
+    else if(counter == 4){
+      console.log(piece + "wins");
+    }
+    else if (row[i] !== piece){
+      counter = 0;
     }
   }
-  console.log("horizontal count: " + counter);
+}
+
+function checkDiagonal(diag, piece){
+
 }
 
 function Piece(type, input){
@@ -131,14 +131,14 @@ Piece.prototype.drop = ((piece, board) => {
 
   let placed = false;
 
-  for(i = 0; i < board.length; i++){
+  for(let i = 0; i < board.length; i++){
 
     if(piece.input - 1 == i /*&& board[1][i] == "| |"*/){
 
       if(board[1][i] == "| |"){
         board[1][i] = piece.type;
 
-        for(j = 0; j < 5; j++){
+        for(let j = 0; j < 5; j++){
           if(board[j + 1][i] == "| |"){
             board[j + 1][i] = piece.type;
             board[j][i] = "| |";
@@ -174,7 +174,6 @@ Player.prototype.input = ((board, callback) => {
     }
   });
 });
-
 
 
 
