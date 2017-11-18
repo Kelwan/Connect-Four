@@ -48,21 +48,21 @@ Board.prototype.run = ((chunk, board) => {
     if(turn == player1.turn){
       console.log("Player 1's turn");
       let piece = new Piece(player1.piece, chunk);
-      let turnCheck = piece.drop(piece, board.grid);
+      let xoDrop = piece.drop(piece, board.grid);
 
       checkVertical(board.grid, player1.piece);
       checkHorizontal(board.grid, player1.piece);
-      checkDiagonal(board.grid, player1.piece);
+      checkDiagonal(board.grid, player1.piece, xoDrop);
     }
 
     else if (turn = player2.turn){
       console.log("Player 2's turn");
       let piece = new Piece(player2.piece, chunk);
-      let turnCheck = piece.drop(piece, board.grid); // I can't send the entirety of the board object without errors.... why?
+      let xoDrop = piece.drop(piece, board.grid); // I can't send the entirety of the board object without errors.... why?
 
       checkVertical(board.grid, player2.piece);
       checkHorizontal(board.grid, player2.piece);
-      checkDiagonal(board.grid, player2.piece);
+      checkDiagonal(board.grid, player2.piece, xoDrop);
     }
 
   }
@@ -77,49 +77,179 @@ Board.prototype.run = ((chunk, board) => {
 });
 
 function checkVertical(board, piece){
-
-  for(let row = 1; row <= 5; row++){
-    let col = [];
-    for(let column = 0; column < 6; column++){
-      col.push(board[row][column]);
-      console.log(col[column][2]);
-    }
-    checkColumn(col, piece);
+  let vic = false;
+  for (let i = 0; i < board.length; i++){
+    vic = getColumn(board, piece, i);
+  }
+  //console.log("checkVertical vic: " + vic);
+  if (vic == true){
+    console.log("vert = true!");
   }
 }
 
-function checkColumn(col, piece){
-  for(let row = 0; row < col.length + 1; row++){
+function getColumn(board, piece, i){
+  let col = [];
+  for (let j = 1; j < board.length; j++){
+    col[j - 1] = board[j][i];
   }
-  console.log(col[1][1]);
+
+  let vic = vertVictory(col, piece);
+  if(vic == true){
+    console.log("VIC IS TRUE");
+    return true;
+  }
+
 }
 
-function checkHorizontal(board, piece){
-  for(let i = 1; i <= 5; i++){
-    checkRow(board[i], piece);
-  }
-}
+function vertVictory(col, piece){
+  let counter = 1;
 
-function checkRow(row, piece){
-  let counter = 0;
-  //console.log("Current row: " + row);
-  for(let i = 0; i < row.length; i++){
-    if (row[i] == piece){
-      counter++;
-      //console.log(piece + " = " + counter);
+  for (let i = 0; i < col.length; i++){
+
+    if(col[i] == piece){
+      counter ++;
     }
-    else if(counter == 4){
-      console.log(piece + "wins");
+
+    if(counter == 4){
+      console.log(piece + "wins vertical!");
+      return true;
     }
-    else if (row[i] !== piece){
+
+    if (col[i] !== piece){
       counter = 0;
     }
   }
 }
 
-function checkDiagonal(diag, piece){
+function checkHorizontal(board, piece){
+  let counter = 0;
+  let row = [];
+
+  for(let i = 1; i < board.length; i++){
+    row[i - 1] = getRow(board, i);
+  }
+
+  for(let j = 0; j < row.length; j++){
+    let victory = rowVictory(row[j], piece);
+    if(victory == true){
+        console.log("Victory is true");
+        break;
+    }
+  }
+}
+
+function getRow(board, i){
+  return board[i];
+}
+
+function rowVictory(row, piece){
+  let counter = 0;
+
+  for(let i = 0; i < row.length; i ++){
+    if(row[i] == piece){
+      counter++;
+    }
+    else if(counter >= 4){
+      console.log(piece + " Wins!");
+      return true;
+    }
+    else if(row[i] !== piece){
+      counter = 0;
+    }
+  }
+}
+
+function checkDiagonal(board, piece, drop){
+  let diag = [];
+
+  console.log("drop zone: " + drop[0] + drop[1]);
+
+  diag = getDiag(board, drop);
+
+  console.log("upLeft - downRight: " + diag[0]);
+  console.log("upRight - downLeft: " + diag[1]);
+
+  diagVictory(board, piece, diag[0], diag[1]);
 
 }
+
+function getDiag(board, drop){
+
+  let upLeft = [];
+  let downLeft = [];
+  let upRight = [];
+  let downRight = [];
+
+  let sum = [];
+
+  for(let i = 0; i < board.length; i++){
+
+    //Upleft diag
+
+
+    if(board[drop[0]-i] && board[drop[0]-i][drop[1]-i]){
+      upLeft[i] = board[drop[0] - i][drop[1] - i];
+    }
+    //downLeft diag
+    if(board[drop[0]+i] && board[drop[0]+i][drop[1]-i]){
+      downLeft[i] = board[drop[0] + i][drop[1] - i];
+    }
+    //upRight diag
+    if(board[drop[0]+i] && board[drop[0]-i][drop[1]+i]){
+      upRight[i] = board[drop[0] - i][drop[1] + i];
+    }
+    //downRight diag
+    if(board[drop[0]+i] && board[drop[0]+i][drop[1]+i]){
+      downRight[i] = board[drop[0] + i][drop[1] + i];
+    }
+
+  }
+
+  //console.log("pre sum upLeft: " + upLeft);
+  //console.log("pre sum downRight: " + downRight);
+  //console.log("pre sum upRight: " + upRight);
+  //console.log("pre sum downLeft: " + downLeft);
+
+    upLeft.shift();
+    upRight.shift();
+
+    upLeft.reverse();
+    upRight.reverse();
+
+  sum[0] = upLeft.concat(downRight);
+  sum[1] = upRight.concat(downLeft);
+  return sum;
+}
+
+function diagVictory(board, piece, diag1, diag2){
+
+  let counter = 0;
+  for (let i = 0; i < diag1.length; i++){
+    if(diag1[i] == piece){
+      counter++;
+    }
+    else if(counter >=4){
+      console.log(piece + " wins a vertical!");
+    }
+    else if(diag1[i] !== piece){
+      counter = 0;
+    }
+  }
+
+  for(let j = 0; j < diag2.length; j++){
+    if(diag2[j] == piece){
+      counter++;
+    }
+    else if(counter >=4){
+      console.log(piece + " wins a vertical!");
+    }
+    else if(diag2[j] !== piece){
+      counter = 0;
+    }
+  }
+
+}
+
 
 function Piece(type, input){
   this.type = type;
@@ -130,31 +260,40 @@ function Piece(type, input){
 Piece.prototype.drop = ((piece, board) => {
 
   let placed = false;
+  let placement = [];
 
   for(let i = 0; i < board.length; i++){
-
-    if(piece.input - 1 == i /*&& board[1][i] == "| |"*/){
-
+    if(piece.input - 1 == i){
       if(board[1][i] == "| |"){
         board[1][i] = piece.type;
+        placement[0] = 1;
+        placement[1] = i;
 
         for(let j = 0; j < 5; j++){
-          if(board[j + 1][i] == "| |"){
+          if(board[j + 1][i] == "| |") {
             board[j + 1][i] = piece.type;
             board[j][i] = "| |";
             placed = true;
+            placement[0] = j + 1;
+            placement[1] = i;
           }
         }
       }
+
       else if(board[1][i] !== "| |"){
         console.log("space taken");
-
+      //board.checkTurn(board.turn); //Objects controlling their methods seems to degrade
       }
     }
   }
 
   console.log(board);
 
+  if(placed == true){
+    //console.log("Piece is placed!");
+  }
+
+  return placement;
 });
 
 
@@ -175,8 +314,7 @@ Player.prototype.input = ((board, callback) => {
   });
 });
 
-
-
+//Activators
 let board = new Board();
 
 console.log(board.grid);

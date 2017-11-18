@@ -1,16 +1,17 @@
 
+let grid = [
+  [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 "],
+  ["| |", "| |", "| |", "| |", "| |", "| |"],
+  ["| |", "| |", "| |", "| |", "| |", "| |"],
+  ["| |", "| |", "| |", "| |", "| |", "| |"],
+  ["| |", "| |", "| |", "| |", "| |", "| |"],
+  ["| |", "| |", "| |", "| |", "| |", "| |"]
+];
 
+grid[2][1] = "hi";
+console.log(grid);
 
+otherArr = [];
 
-let val = false
-val = hello();
-
-
-function hello(){
-  return true;
-}
-
-
-if (val = true){
-  console.log("This is true");
-}
+otherArr[0] = grid[2][1];
+console.log(otherArr[0]);
