@@ -133,7 +133,6 @@ function checkHorizontal(board, piece){
     let victory = rowVictory(row[j], piece);
     if(victory == true){
         console.log("Victory is true");
-        break;
     }
   }
 }
@@ -149,11 +148,11 @@ function rowVictory(row, piece){
     if(row[i] == piece){
       counter++;
     }
-    else if(counter >= 4){
+    if(counter >= 4){
       console.log(piece + " Wins!");
       return true;
     }
-    else if(row[i] !== piece){
+    if(row[i] !== piece){
       counter = 0;
     }
   }
@@ -195,7 +194,7 @@ function getDiag(board, drop){
       downLeft[i] = board[drop[0] + i][drop[1] - i];
     }
     //upRight diag
-    if(board[drop[0]+i] && board[drop[0]-i][drop[1]+i]){
+    if(board[drop[0]-i] && board[drop[0]-i][drop[1]+i]){
       upRight[i] = board[drop[0] - i][drop[1] + i];
     }
     //downRight diag
@@ -205,57 +204,51 @@ function getDiag(board, drop){
 
   }
 
-  //console.log("pre sum upLeft: " + upLeft);
-  //console.log("pre sum downRight: " + downRight);
-  //console.log("pre sum upRight: " + upRight);
-  //console.log("pre sum downLeft: " + downLeft);
-
     upLeft.shift();
     upRight.shift();
-
     upLeft.reverse();
     upRight.reverse();
 
   sum[0] = upLeft.concat(downRight);
   sum[1] = upRight.concat(downLeft);
+
   return sum;
 }
 
 function diagVictory(board, piece, diag1, diag2){
 
-  let counter = 0;
+  let counter1 = 0;
+  let counter2 = 0;
+
   for (let i = 0; i < diag1.length; i++){
     if(diag1[i] == piece){
-      counter++;
+      counter1++;
     }
-    else if(counter >=4){
-      console.log(piece + " wins a vertical!");
+    if(counter1 >= 4){
+      console.log(piece + " has a vertical victory!");
     }
-    else if(diag1[i] !== piece){
-      counter = 0;
+    if(diag1[i] !== piece){
+      counter1 = 0;
     }
   }
 
   for(let j = 0; j < diag2.length; j++){
     if(diag2[j] == piece){
-      counter++;
+      counter2++;
     }
-    else if(counter >=4){
+    if(counter2 >= 4){
       console.log(piece + " wins a vertical!");
     }
-    else if(diag2[j] !== piece){
-      counter = 0;
+    if(diag2[j] !== piece){
+      counter2 = 0;
     }
   }
-
 }
-
 
 function Piece(type, input){
   this.type = type;
   this.input = input;
 }
-
 
 Piece.prototype.drop = ((piece, board) => {
 
@@ -282,17 +275,10 @@ Piece.prototype.drop = ((piece, board) => {
 
       else if(board[1][i] !== "| |"){
         console.log("space taken");
-      //board.checkTurn(board.turn); //Objects controlling their methods seems to degrade
       }
     }
   }
-
   console.log(board);
-
-  if(placed == true){
-    //console.log("Piece is placed!");
-  }
-
   return placement;
 });
 
